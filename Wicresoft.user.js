@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AriesAutomation
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @updateURL    https://raw.githubusercontent.com/The-Aries/AriesAutomation/blob/main/Wicresoft.meta.js
 // @downloadURL  https://raw.githubusercontent.com/The-Aries/AriesAutomation/blob/main/Wicresoft.user.js
 // @description  该脚本用于自动刷新页面以跳过验证窗口和数学题，自动提交课程评价
