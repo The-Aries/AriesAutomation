@@ -251,8 +251,9 @@ function autoPlayCourse()
                         //设置二倍速
                         old_video.addEventListener("playing", function ()
                         {
-                            if (old_video.playbackRate == 1.0 && old_isVideoPlaying != true)
+                            if (old_video.playbackRate != 2.0 && old_isVideoPlaying != true)
                             {
+                                console.log("找到视频元素");
                                 //old_video.playbackRate = 2.0;
                                 //console.log("设置视频为2倍速");
                                 old_isVideoPlaying = true; // 视频正在播放
@@ -265,6 +266,7 @@ function autoPlayCourse()
                             if (old_isVideoPlaying)
                             {
                                 // 仅当视频从播放状态转为暂停状态时刷新页面
+
                                 console.log("视频已暂停，刷新页面");
                                 location.reload();
                             }
