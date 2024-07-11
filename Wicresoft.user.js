@@ -251,10 +251,10 @@ function autoPlayCourse()
                         //设置二倍速
                         old_video.addEventListener("playing", function ()
                         {
-                            if (old_video.playbackRate !== 2.0)
+                            if (old_video.playbackRate == 1.0 && old_isVideoPlaying != true)
                             {
-                                old_video.playbackRate = 2.0;
-                                console.log("设置视频为2倍速");
+                                //old_video.playbackRate = 2.0;
+                                //console.log("设置视频为2倍速");
                                 old_isVideoPlaying = true; // 视频正在播放
                             }
                         });
