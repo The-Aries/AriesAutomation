@@ -2,8 +2,8 @@
 // @name WicresoftRate
 // @namespace http://tampermonkey.net/
 // @version 1.00
-// @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
-// @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
+// @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/WicresoftRate.user.js
+// @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/WicresoftRate.user.js
 // @description 该脚本用于提交课程评价
 // @author Aries
 // @match *://v4.21tb.com/els/html/studyCourse/studyCourse.enterCourse.do?courseId=*
