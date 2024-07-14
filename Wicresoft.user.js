@@ -1,18 +1,16 @@
 // ==UserScript==
-// @name AriesAutomation
+// @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.95
+// @version 0.96
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
-// @description 该脚本用于自动刷新页面以跳过验证窗口和数学题，自动提交课程评价
+// @description 该脚本用于自动播放打开的视频课程直到结束
 // @author Aries
 // @match *://v4.21tb.com/els/html/course/course.courseInfo.do?courseId=*
 // @match *://v4.21tb.com/els/html/courseStudyItem/courseStudyItem.learn.do?courseId=*
 // @match *://v4.21tb.com/els/html/studyCourse/studyCourse.enterCourse.do?courseId=*
 // @grant none
 // ==/UserScript==
-// 创建日期：2024年6月30日
-// 最后更新日期：2024年7月10日
 ( window.onload = function ()
 {
     "use strict";
@@ -56,8 +54,8 @@
     if ( window.location.href.includes( 'willGoStep=COURSE_EVALUATE' ) )
     {
         // 课程评价页面的代码
-        console.log( "检测到评价页面，执行自动评分业务" );
-        rateCourse();
+        console.log( "检测到评价页面，已取消评价功能，需要启用WicresoftRate脚本" );
+        //rateCourse();
     }
 } )();
 
