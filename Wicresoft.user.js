@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.96
+// @version 0.961
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
@@ -212,7 +212,6 @@ function nextStep()
 function autoPlayCourse()
 {
     nextStep();
-    // var iframe = getAliPlayerFrame();
 
     // 监听视频元素并设置播放速度
     setVideoPlaybackRate( getAliPlayerFrame() );
@@ -220,7 +219,10 @@ function autoPlayCourse()
     // 自动播放下一章节
     autoClickNextChapter( getAliPlayerFrame() );
 
+    // 自动过作弊
     autoPassCheat( getAliPlayerFrame() );
+
+    setInterval( window.location.reload(), 30 * 60 * 1000 )
 }
 
 // 检测aliPlayerFrame
