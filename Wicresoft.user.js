@@ -1,19 +1,31 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.961
+// @version 0.97
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
 // @author Aries
+// @match *://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=*
 // @match *://v4.21tb.com/els/html/course/course.courseInfo.do?courseId=*
 // @match *://v4.21tb.com/els/html/courseStudyItem/courseStudyItem.learn.do?courseId=*
 // @match *://v4.21tb.com/els/html/studyCourse/studyCourse.enterCourse.do?courseId=*
 // @grant none
 // ==/UserScript==
-( window.onload = function ()
+( function ()
 {
     "use strict";
+    /***********************选课页面*******************************
+    ************************选课页面******************************
+    ************************选课页面*****************************
+    ************************选课页面******************************
+    ************************选课页面*******************************/
+    if ( window.location.href.includes( "rtr-frontend" ) )
+    {
+        // 自动选课
+        console.log( "检测到选课页面，执行自动选课业务" );
+        setTimeout( nextCourse, 5000 );
+    }
     /***********************预览页面*******************************
     ************************预览页面******************************
     ************************预览页面*****************************
@@ -166,8 +178,8 @@ function submitOperation()
 
 function nextStep()
 {
-    // 定义一个函数来处理按钮点击
-    function handleButtonClick()
+
+    function nextOperation()
     {
         const nextStepButton = document.getElementById( "goNextStep" );
         if ( nextStepButton )
@@ -176,7 +188,8 @@ function nextStep()
             if ( !nextStepButton.classList.contains( "hide" ) )
             {
                 console.log( "按钮已显示，点击进入下一步" );
-                nextStepButton.click();
+                window.location.href = "https://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=2";
+                //nextStepButton.click();
                 nextButtonObserver.disconnect(); // 成功点击后停止观察
             } //else { console.log("按钮未显示"); }
         } //else { console.log("未找到'进入下一步'按钮"); }
@@ -184,7 +197,7 @@ function nextStep()
     }
 
     // 初次检查按钮状态
-    handleButtonClick();
+    nextOperation();
 
     // 创建 MutationObserver 观察 DOM 变化
     const nextButtonObserver = new MutationObserver( ( mutations ) =>
@@ -192,7 +205,7 @@ function nextStep()
         mutations.forEach( ( mutation ) =>
         {
             if ( mutation.type === "childList" || mutation.type === "attributes" )
-            { handleButtonClick(); }
+            { nextOperation(); }
         } );
     } );
     // 限制观察范围为按钮的父元素
@@ -211,30 +224,23 @@ function nextStep()
 // 自动播放业务
 function autoPlayCourse()
 {
+    // 进入下一步
     nextStep();
 
+    // 检测aliPlayerFrame
+    var iframe = document.getElementById( "aliPlayerFrame" ) || document.getElementById( "iframe_aliplayer" );
+    console.log( iframe ? "找到 " + iframe.id : "未找到 aliPlayerFrame 或 iframe_aliplayer" );
+
     // 监听视频元素并设置播放速度
-    setVideoPlaybackRate( getAliPlayerFrame() );
+    setVideoPlaybackRate( iframe );
 
     // 自动播放下一章节
-    autoClickNextChapter( getAliPlayerFrame() );
+    autoClickNextChapter( iframe );
 
     // 自动过作弊
-    autoPassCheat( getAliPlayerFrame() );
+    autoPassCheat( iframe );
 
-    setInterval( window.location.reload(), 30 * 60 * 1000 )
-}
-
-// 检测aliPlayerFrame
-function getAliPlayerFrame()
-{
-    // 检查两个可能的 iframe ID
-    var iframe = document.getElementById( "aliPlayerFrame" ) || document.getElementById( "iframe_aliplayer" );
-    if ( iframe )
-    {
-        console.log( "找到 " + iframe.id );
-        return iframe;
-    } else { console.log( "未找到 aliPlayerFrame 或 iframe_aliplayer" ); }
+    setInterval( window.location.reload, 30 * 60 * 1000 )
 }
 
 // 设置视频播放速度为2倍速
@@ -377,4 +383,28 @@ function autoPassCheat( iframe )
     var config = { childList: true, subtree: true };
     // 开始观察整个文档
     observer.observe( iframe.id === "aliPlayerFrame" ? iframe.contentDocument.body : document.body, config );
+}
+function nextCourse()
+{// 获取所有的li元素
+
+    const listItems = document.querySelectorAll( 'li.task-list-module-item' );
+
+    // 遍历每个li元素
+    for ( let i = 0; i < listItems.length; i++ )
+    {
+        const item = listItems[i];
+        const progressElement = item.querySelector( '.status-wrap .status-item i' );
+
+        // 检查进度是否不为100%
+        if ( progressElement )
+        {
+            const progress = progressElement.textContent.replace( '%', '' );
+            if ( parseInt( progress ) < 100 )
+            {
+                // 点击该课程
+                item.click();
+                break;
+            }
+        }
+    }
 }
