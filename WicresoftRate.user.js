@@ -1,15 +1,16 @@
 // ==UserScript==
 // @name WicresoftRate
 // @namespace http://tampermonkey.net/
-// @version 0.99
+// @version 0.991
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于提交课程评价
 // @author Aries
 // @match *://v4.21tb.com/els/html/studyCourse/studyCourse.enterCourse.do?courseId=*
+// @match *://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=*
 // @grant none
 // ==/UserScript==
-( window.onload = function ()
+( function ()
 {
     "use strict";
     /***********************评价页面*******************************
@@ -17,7 +18,7 @@
     ************************评价页面*****************************
     ************************评价页面******************************
     ************************评价页面*******************************/
-    if ( window.location.href.includes( 'willGoStep=COURSE_EVALUATE' ) || window.location.href.includes( 'viewEvaluatePage' ) )
+    if ( window.location.href.includes( 'studyCourse' ) )
     {
         // 课程评价页面的代码
         console.log( "检测到评价页面，执行自动评分业务" );
