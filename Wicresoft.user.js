@@ -75,7 +75,8 @@
                 // 课程评估页面的代码
                 console.log( "检测到课程评估页面，已取消课程评估功能，需要启用WicresoftRate脚本" );
                 rateCourse();
-                window.location.href = "https://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=2";
+                setTimeout( function () { window.location.href = "https://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=2"; }, 3 * 1000 );
+
             }
         }
     }
