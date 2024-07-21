@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.96
+// @version 0.962
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
@@ -9,55 +9,50 @@
 // @match *://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=*
 // @match *://v4.21tb.com/els/html/course/course.courseInfo.do?courseId=*
 // @match *://v4.21tb.com/els/html/courseStudyItem/courseStudyItem.learn.do?courseId=*
-// @match *://v4.21tb.com/els/html/studyCourse/studyCourse.enterCourse.do?courseId=*
+// @match *://v4.21tb.com/els/html/studyCourse/studyCourse*
 // @grant none
 // ==/UserScript==
 ( function ()
 {
     "use strict";
-    window.addEventListener( 'load', main );
+    var iframe;
+    var iframeDoc;
+    var video;
+
     console.log( "所有资源加载完成，开始执行主逻辑" );
+    window.addEventListener( 'load', main );
     /***********************自定义函数*******************************
-    ************************自定义函数******************************
-    ************************自定义函数*****************************
     ************************自定义函数******************************
     ************************自定义函数*******************************/
     function main()
     {
+
         /***********************选课页面*******************************
-            ************************选课页面******************************
-            ************************选课页面*****************************
-            ************************选课页面******************************
-            ************************选课页面*******************************/
+        ************************选课页面******************************
+        ************************选课页面*******************************/
         if ( window.location.href.includes( "rtr-frontend" ) )
         {
             // 自动选课
-            console.log( "检测到选课页面，执行自动选课业务" );
             setTimeout( nextCourse, 5000 );
+            console.log( "检测到选课页面，5秒后执行自动选课业务" );
         }
         /***********************预览页面*******************************
-        ************************预览页面******************************
-        ************************预览页面*****************************
         ************************预览页面******************************
         ************************预览页面*******************************/
         if ( window.location.href.includes( "courseInfo" ) )
         {
-            console.log( "检测到预览页面，自动进入课程" );
-            goIntoClass();
+            setTimeout( goIntoClass, 1000 );
+            console.log( "检测到预览页面，1秒后自动进入课程" );
         }
         /***********************视频页面*******************************
-        ************************视频页面******************************
-        ************************视频页面*****************************
         ************************视频页面******************************
         ************************视频页面*******************************/
         if ( window.location.href.includes( "courseStudyItem" ) )
         {
-            console.log( "检测到视频页面，执行自动播放业务" );
-            setTimeout( autoPlayCourse, 1000 );
+            setTimeout( autoPlayCourse, 3000 );
+            console.log( "检测到视频页面，3秒后执行自动播放业务" );
         }
         /***********************测试页面/评价页面*******************************
-        ************************测试页面/评价页面******************************
-        ************************测试页面/评价页面*****************************
         ************************测试页面/评价页面******************************
         ************************测试页面/评价页面*******************************/
         if ( window.location.href.includes( 'studyCourse' ) )
@@ -68,15 +63,17 @@
             if ( titleText !== "课程评估" )
             {
                 // 课前测试页面的代码
-                console.log( "检测到课前测试页面，执行自动答题业务" );
                 autoQuizCource();
+                console.log( "检测到课前测试页面，执行自动答题业务" );
             } else
             {
                 // 课程评估页面的代码
-                console.log( "检测到课程评估页面，已取消课程评估功能，需要启用WicresoftRate脚本" );
                 rateCourse();
-                setTimeout( function () { window.location.href = "https://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=2"; }, 3 * 1000 );
-
+                console.log( "检测到课程评估页面,执行自动评估业务" );
+                setTimeout( function ()
+                {
+                    window.location.href = "https://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=2";
+                }, 2000 );
             }
         }
     }
@@ -232,78 +229,75 @@
         // 进入下一步
         nextStep();
 
+        iframe = document.getElementById( "aliPlayerFrame" ) || document.getElementById( "iframe_aliplayer" );
+        iframeDoc = iframe.contentDocument;
+
         // 检测aliPlayerFrame
-        var iframe = document.getElementById( "aliPlayerFrame" ) || document.getElementById( "iframe_aliplayer" );
         console.log( iframe ? "找到 " + iframe.id : "未找到 aliPlayerFrame 或 iframe_aliplayer" );
 
-        // 监听视频元素并设置播放速度
-        setVideoPlaybackRate( iframe );
+        if ( iframe.id === "aliPlayerFrame" ) videoOperator(); // 设置视频播放速度为2倍速
 
-        // 自动播放下一章节
-        autoClickNextChapter( iframe );
+        autoClickNextChapter();// 自动播放下一章节
 
-        // 自动过作弊
-        autoPassCheat( iframe );
-
-        setInterval( window.location.reload, 30 * 60 * 1000 )
+        autoPassCheat();// 自动过作弊
     }
 
     // 设置视频播放速度为2倍速
-    function setVideoPlaybackRate( iframe )
+    function videoOperator()
     {
+        videoOperation();
+
         var videoObserver = new MutationObserver( function ( mutations )
         {
             mutations.forEach( function ( mutation )
             {
-                var video = iframe.contentDocument.querySelector( "video" );
-                if ( mutation.type === "childList" && video )
-                {
-                    //设置二倍速
-                    video.addEventListener( "playing", function ()
-                    {
-                        if ( video.playbackRate !== 2.0 && iframe.id === "aliPlayerFrame" )
-                        {
-                            console.log( "找到视频元素" );
-                            video.playbackRate = 2.0;
-                            console.log( "设置视频为2倍速" );
-                        }
-                    } );
-                }
+                console.log( "3秒后操作视频" );
+                setTimeout( videoOperation, 3000 );
             } );
         } );
 
-        videoObserver.observe( iframe.contentDocument.body, {
-            childList: true,
-            subtree: true,
-        } );
-
-
+        videoObserver.observe( iframeDoc.querySelector( '.chapter-container' ), { childList: true, subtree: true, attributes: true } );
     }
 
-    function autoClickNextChapter( iframe )
+    function videoOperation()
     {
-        setVideoPlaybackRate( iframe );
+
+        video = iframeDoc.querySelector( "video" );
+
+        if ( !video ) console.log( "未找到视频元素" );// 检查是否找到视频元素
+
+        video.playbackRate = 2.0; //设置二倍速播放
+
+        video.addEventListener( 'pause', function ()
+        {
+            video.play();//播放视频
+        } );
+    }
+
+
+    function autoClickNextChapter()
+    {
 
         var chapterObserver = new MutationObserver( function ( mutations )
         {
             mutations.forEach( function ( mutation )
             {
-                autoPlayNextChapter( iframe );
-                console.log( "检测到章节变化" );
+                autoPlayNextChapter();
+                console.log( '章节发生变化' );
             } );
         } );
 
-        chapterObserver.observe( iframe.id === 'aliPlayerFrame' ? iframe.contentDocument.querySelector( '.chapter-container' ) : document.getElementById( 'courseItemId' ),
-            { childList: true, subtree: true, attributes: true, characterData: true } );
+        chapterObserver.observe( iframe.id === 'aliPlayerFrame' ? iframeDoc.querySelector( '.chapter-container' ) : document.getElementById( 'courseItemId' ),
+            { childList: true, subtree: true, attributes: true } );
 
-        autoPlayNextChapter( iframe );
+        autoPlayNextChapter();
     }
 
-    function autoPlayNextChapter( iframe )
+    function autoPlayNextChapter()
     {
 
         // 获取所有章节的section-item或cl-catalog-item-sub
-        let sections = iframe.id === 'aliPlayerFrame' ? iframe.contentDocument.querySelectorAll( '.section-item' ) : document.querySelectorAll( '.cl-catalog-item-sub' );
+        let sections = iframe.id === 'aliPlayerFrame' ? iframeDoc.querySelectorAll( '.section-item' ) : document.querySelectorAll( '.cl-catalog-item-sub' );
 
         // console.log( '一共有' + sections.length + '个章节' );
 
@@ -315,7 +309,6 @@
 
             if ( ( Chapter.classList.contains( 'active' ) && section.classList.contains( 'finish' ) ) || ( Chapter.classList.contains( 'cl-catalog-playing' ) && Chapter.classList.contains( 'item-done' ) ) )
             {
-                console.log( '找到当前播放且已完成的章节:', section );
 
                 // 查找未播放的章节
                 for ( let j = 0; j < sections.length; j++ )
@@ -325,13 +318,15 @@
 
                     if ( ( !nextSection.classList.contains( 'finish' ) ) && ( !nextChapter.classList.contains( 'item-done' ) ) )
                     {
+                        console.log( '找到当前播放且已完成的章节:', section );
                         console.log( '找到下一个未播放的章节:', nextSection );
                         nextChapter.click(); // 点击未播放的章节
-                        return; // 结束函数
+                        break; // 结束函数
                     }
                 }
             }
         }
+
     }
 
     function autoQuizCource()
@@ -365,7 +360,7 @@
         }, 500 ); // 延时0.5秒
     }
 
-    function autoPassCheat( iframe )
+    function autoPassCheat()
     {
         // 创建一个 MutationObserver 实例来观察 DOM 变化
         var observer = new MutationObserver( function ( mutations )
@@ -387,7 +382,7 @@
         // 配置观察选项
         var config = { childList: true, subtree: true };
         // 开始观察整个文档
-        observer.observe( iframe.id === "aliPlayerFrame" ? iframe.contentDocument.body : document.body, config );
+        observer.observe( iframe.id === "aliPlayerFrame" ? iframeDoc.body : document.body, config );
     }
     function nextCourse()
     {// 获取所有的li元素
