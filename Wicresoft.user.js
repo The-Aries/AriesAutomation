@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.962
+// @version 0.96
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
@@ -13,13 +13,15 @@
 // @grant none
 // ==/UserScript==
 ( function ()
-{
+ {
     "use strict";
     var iframe;
     var iframeDoc;
     var video;
+    var dummyButton;
 
     console.log( "所有资源加载完成，开始执行主逻辑" );
+    // main();
     window.addEventListener( 'load', main );
     /***********************自定义函数*******************************
     ************************自定义函数******************************
@@ -41,7 +43,7 @@
         ************************预览页面*******************************/
         if ( window.location.href.includes( "courseInfo" ) )
         {
-            setTimeout( goIntoClass, 1000 );
+            setTimeout( goIntoClass, 500 );
             console.log( "检测到预览页面，1秒后自动进入课程" );
         }
         /***********************视频页面*******************************
@@ -49,8 +51,8 @@
         ************************视频页面*******************************/
         if ( window.location.href.includes( "courseStudyItem" ) )
         {
-            setTimeout( autoPlayCourse, 3000 );
-            console.log( "检测到视频页面，3秒后执行自动播放业务" );
+            setTimeout( autoPlayCourse, 1500 );
+            console.log( "检测到视频页面，1.5秒后执行自动播放业务" );
         }
         /***********************测试页面/评价页面*******************************
         ************************测试页面/评价页面******************************
@@ -71,7 +73,7 @@
                 rateCourse();
                 console.log( "检测到课程评估页面,执行自动评估业务" );
                 setTimeout( function ()
-                {
+                           {
                     window.location.href = "https://v4.21tb.com/rtr-frontend/student/allTask?showDisplayStyle=Card&showStyleLength=2";
                 }, 2000 );
             }
@@ -84,8 +86,8 @@
     {
         // 获取进入课程按钮
         const enterButton =
-            document.getElementById( "goStudyBtn" ) ||
-            document.getElementById( "chooseCourse" );
+              document.getElementById( "goStudyBtn" ) ||
+              document.getElementById( "chooseCourse" );
         if ( enterButton )
         {
             console.log( "找到进入课程按钮" );
@@ -114,7 +116,7 @@
         if ( ratingButtons.length > 0 )
         {
             ratingButtons.forEach( ( button ) =>
-            {
+                                  {
                 button.click();
                 console.log( "已选择非常满意选项" );
                 // 打印每个按钮的状态
@@ -136,16 +138,16 @@
     {
         // 定义四个按钮的ID
         const buttonIds =
-            [
-                "4ffacebaac4b422b8f0cfa4708ac7435_5",
-                "5ea9cc82bc1940789cb72ab772ebd1c2_5",
-                "f91d7621ffde475bb30741ccc1dc8784_5",
-                "21640c84e4bc4cddb9bec40097a892be_5",
-            ];
+              [
+                  "4ffacebaac4b422b8f0cfa4708ac7435_5",
+                  "5ea9cc82bc1940789cb72ab772ebd1c2_5",
+                  "f91d7621ffde475bb30741ccc1dc8784_5",
+                  "21640c84e4bc4cddb9bec40097a892be_5",
+              ];
 
         // 遍历所有按钮ID并模拟点击操作
         buttonIds.forEach( ( id ) =>
-        {
+                          {
             const button = document.getElementById( id );
             if ( button )
             {
@@ -169,7 +171,7 @@
         } else { console.log( "未找到提交按钮" ); }
 
         setTimeout( () =>
-        {
+                   {
             const confirmButton = document.querySelector( ".layui-layer-btn1" );
             if ( confirmButton )
             {
@@ -203,9 +205,9 @@
 
         // 创建 MutationObserver 观察 DOM 变化
         const nextButtonObserver = new MutationObserver( ( mutations ) =>
-        {
+                                                        {
             mutations.forEach( ( mutation ) =>
-            {
+                              {
                 if ( mutation.type === "childList" || mutation.type === "attributes" )
                 { nextOperation(); }
             } );
@@ -223,23 +225,52 @@
         nextButtonObserver.observe( targetNode, config );
     }
 
+    ////////////////////////////////////////////
+    function checkSameOrigin(iframe) {
+        // 获取当前页面的 URL 组件
+        let currentOrigin = window.location.origin;
+
+        // 获取 iframe 的 URL 组件
+        let iframeSrc = iframe.src;
+        let iframeOrigin;
+
+        // 尝试解析 iframe 的源
+        try {
+            iframeOrigin = new URL(iframeSrc).origin;
+        } catch (e) {
+            console.log("无法解析 iframe 的 URL:", e);
+            return false;
+        }
+
+        // 比较两个源
+        return currentOrigin === iframeOrigin;
+    }
+
+    /////////////////////////////////////////////////
+
     // 自动播放业务
     function autoPlayCourse()
     {
         // 进入下一步
+
         nextStep();
 
-        iframe = document.getElementById( "aliPlayerFrame" ) || document.getElementById( "iframe_aliplayer" );
-        iframeDoc = iframe.contentDocument;
+        iframe = document.getElementById( "aliPlayerFrame" ) || document.getElementById( "iframe_aliplayer" ) || document.getElementById( "urlCourseIframeId" );
 
         // 检测aliPlayerFrame
-        console.log( iframe ? "找到 " + iframe.id : "未找到 aliPlayerFrame 或 iframe_aliplayer" );
+        console.log( iframe ? "找到 " + iframe.id : "未找到Iframe" );
+
+
+        if ( iframe.id === "urlCourseIframeId" ) setInterval(() => window.location.reload(), 200 * 1000);
 
         if ( iframe.id === "aliPlayerFrame" ) videoOperator(); // 设置视频播放速度为2倍速
 
-        autoClickNextChapter();// 自动播放下一章节
+        iframeDoc = iframe.contentDocument;
 
         autoPassCheat();// 自动过作弊
+
+        autoClickNextChapter();// 自动播放下一章节
+
     }
 
     // 设置视频播放速度为2倍速
@@ -248,11 +279,11 @@
         videoOperation();
 
         var videoObserver = new MutationObserver( function ( mutations )
-        {
+                                                 {
             mutations.forEach( function ( mutation )
-            {
-                console.log( "3秒后操作视频" );
-                setTimeout( videoOperation, 3000 );
+                              {
+                console.log( "1秒后操作视频" );
+                setTimeout( videoOperation, 1000 );
             } );
         } );
 
@@ -265,11 +296,11 @@
         video = iframeDoc.querySelector( "video" );
 
         if ( !video ) console.log( "未找到视频元素" );// 检查是否找到视频元素
-
+        video.play();
         video.playbackRate = 2.0; //设置二倍速播放
 
         video.addEventListener( 'pause', function ()
-        {
+                               {
             video.play();//播放视频
         } );
     }
@@ -279,16 +310,16 @@
     {
 
         var chapterObserver = new MutationObserver( function ( mutations )
-        {
+                                                   {
             mutations.forEach( function ( mutation )
-            {
+                              {
                 autoPlayNextChapter();
                 console.log( '章节发生变化' );
             } );
         } );
 
         chapterObserver.observe( iframe.id === 'aliPlayerFrame' ? iframeDoc.querySelector( '.chapter-container' ) : document.getElementById( 'courseItemId' ),
-            { childList: true, subtree: true, attributes: true } );
+                                { childList: true, subtree: true, attributes: true } );
 
         autoPlayNextChapter();
     }
@@ -335,7 +366,7 @@
         const ratingSelector = 'input[type="radio"]';
         const ratingButtons = document.querySelectorAll( ratingSelector );
         ratingButtons.forEach( ( button ) =>
-        {
+                              {
             button.click();
             // 打印每个按钮的状态
             console.log(
@@ -350,7 +381,7 @@
         submitButton.click();
 
         setTimeout( () =>
-        {
+                   {
             const confirmButton = document.querySelector( ".layui-layer-btn1" );
             if ( confirmButton )
             {
@@ -362,14 +393,17 @@
 
     function autoPassCheat()
     {
+        console.log( '开启反防作弊...' );
+
         // 创建一个 MutationObserver 实例来观察 DOM 变化
         var observer = new MutationObserver( function ( mutations )
-        {
+                                            {
             mutations.forEach( function ( mutation )
-            {
+                              {
+                console.log('new mutation ' + mutation.type + '  '+ mutation);
                 // 检查所有新增的节点
                 mutation.addedNodes.forEach( function ( node )
-                {
+                                            {
                     // 判断是否是元素节点，并且包含指定的文本内容
                     if ( node.nodeType === Node.ELEMENT_NODE && node.textContent.includes( '系统提示' ) )
                     {
@@ -383,11 +417,13 @@
         var config = { childList: true, subtree: true };
         // 开始观察整个文档
         observer.observe( iframe.id === "aliPlayerFrame" ? iframeDoc.body : document.body, config );
+
     }
     function nextCourse()
     {// 获取所有的li元素
 
         const listItems = document.querySelectorAll( 'li.task-list-module-item' );
+        var flag = 0;
 
         // 遍历每个li元素
         for ( let i = 0; i < listItems.length; i++ )
@@ -401,9 +437,13 @@
                 const progress = progressElement.textContent.replace( '%', '' );
                 if ( parseInt( progress ) < 100 )
                 {
-                    // 点击该课程
-                    item.click();
-                    break;
+                    flag = flag + 1;
+                    if(flag > 4)
+                    {
+                        // 点击该课程
+                        item.click();
+                        break;
+                    }
                 }
             }
         }
