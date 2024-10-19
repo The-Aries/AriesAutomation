@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.971
+// @version 0.972
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
@@ -335,6 +335,7 @@
             if ( !video )
             {
                 console.log( "未找到视频元素" ); // 检查是否找到视频元素
+                window.location.reload(); // 刷新网页
             } else
             {
                 video.muted = true;
@@ -362,8 +363,6 @@
                     simulateClick( 28, 508, iframe );
 
                 }, 1000 ); // 每1秒执行一次
-
-                console.log( "自动点击" + video + "播放按钮" );
             }
         }
 
@@ -566,7 +565,7 @@ document.addEventListener('mousemove', function(event) {
 
     // 在控制台中输出坐标
     console.log(`X: ${mouseX}, Y: ${mouseY}`);
-    
+
     // 如果你想在页面中显示，可以在HTML中指定一个元素进行展示
     const mousePositionElement = document.getElementById('mousePosition');
     if (mousePositionElement) {
