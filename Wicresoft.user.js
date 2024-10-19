@@ -341,9 +341,6 @@
 
                 const intervalId = setInterval( () =>
                 {
-                    console.log( "检测到iframe_aliplayer且" + video + "video.paused == " + video.paused );
-                    simulateClick( 28, 508, iframe );
-
                     // 导致逻辑混乱的部分
                     // video.play().then( () =>
                     // {
@@ -353,13 +350,17 @@
                     //     console.error( "播放失败:", error );
                     // } );
 
-                    // 修改判断条件
+
                     if ( video && !video.paused )
                     {
                         clearInterval( intervalId ); // 视频已播放，清除定时器
                         console.log( "视频已播放，退出操作。" );
                         return;
                     }
+
+                    console.log( "检测到iframe_aliplayer且" + video + "video.paused == " + video.paused );
+                    simulateClick( 28, 508, iframe );
+
                 }, 1000 ); // 每1秒执行一次
 
                 console.log( "自动点击" + video + "播放按钮" );
@@ -540,7 +541,7 @@
             iframe.contentDocument.addEventListener( 'click', handleClickDetails, { once: true } );
 
             // 模拟三次点击
-            for ( let i = 0; i < 3; i++ )
+            for ( let i = 0; i < 1; i++ )
             {
                 // 触发 mouse down 和 mouse up 事件
                 iframe.contentDocument.dispatchEvent( mouseDownEvent );
