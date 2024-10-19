@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.97
+// @version 0.971
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
