@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.972
+// @version 0.973
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
@@ -329,6 +329,39 @@
 
     function autoPlayNextChapter()
     {
+
+
+        // 获取所有章节的section-item或cl-catalog-item-sub
+        let sections = iframe.id === 'aliPlayerFrame' ? iframeDoc.querySelectorAll( '.section-item' ) : document.querySelectorAll( '.cl-catalog-item-sub' );
+
+        // console.log( '一共有' + sections.length + '个章节' );
+
+        // 迭代所有章节，找到当前正在播放且已完成的章节
+        for ( let i = 0; i < sections.length; i++ )
+        {
+            const section = sections[i];
+            const Chapter = section.querySelector( '.first-line' ) || section.querySelector( '.cl-catalog-link' );
+
+            if ( ( Chapter.classList.contains( 'active' ) && section.classList.contains( 'finish' ) ) || ( Chapter.classList.contains( 'cl-catalog-playing' ) && Chapter.classList.contains( 'item-done' ) ) )
+            {
+
+                // 查找未播放的章节
+                for ( let j = 0; j < sections.length; j++ )
+                {
+                    const nextSection = sections[j];
+                    const nextChapter = nextSection.querySelector( '.first-line' ) || nextSection.querySelector( '.cl-catalog-link' );
+
+                    if ( ( !nextSection.classList.contains( 'finish' ) ) && ( !nextChapter.classList.contains( 'item-done' ) ) )
+                    {
+                        console.log( '找到当前播放且已完成的章节:', section );
+                        console.log( '找到下一个未播放的章节:', nextSection );
+                        nextChapter.click(); // 点击未播放的章节
+                        break; // 结束函数
+                    }
+                }
+            }
+        }
+
         if ( iframe.id === "iframe_aliplayer" )
         {
             video = iframeDoc.querySelector( "video" );
@@ -365,38 +398,6 @@
                 }, 1000 ); // 每1秒执行一次
             }
         }
-
-        // 获取所有章节的section-item或cl-catalog-item-sub
-        let sections = iframe.id === 'aliPlayerFrame' ? iframeDoc.querySelectorAll( '.section-item' ) : document.querySelectorAll( '.cl-catalog-item-sub' );
-
-        // console.log( '一共有' + sections.length + '个章节' );
-
-        // 迭代所有章节，找到当前正在播放且已完成的章节
-        for ( let i = 0; i < sections.length; i++ )
-        {
-            const section = sections[i];
-            const Chapter = section.querySelector( '.first-line' ) || section.querySelector( '.cl-catalog-link' );
-
-            if ( ( Chapter.classList.contains( 'active' ) && section.classList.contains( 'finish' ) ) || ( Chapter.classList.contains( 'cl-catalog-playing' ) && Chapter.classList.contains( 'item-done' ) ) )
-            {
-
-                // 查找未播放的章节
-                for ( let j = 0; j < sections.length; j++ )
-                {
-                    const nextSection = sections[j];
-                    const nextChapter = nextSection.querySelector( '.first-line' ) || nextSection.querySelector( '.cl-catalog-link' );
-
-                    if ( ( !nextSection.classList.contains( 'finish' ) ) && ( !nextChapter.classList.contains( 'item-done' ) ) )
-                    {
-                        console.log( '找到当前播放且已完成的章节:', section );
-                        console.log( '找到下一个未播放的章节:', nextSection );
-                        nextChapter.click(); // 点击未播放的章节
-                        break; // 结束函数
-                    }
-                }
-            }
-        }
-
     }
 
     function autoQuizCource()
@@ -565,7 +566,7 @@ document.addEventListener('mousemove', function(event) {
 
     // 在控制台中输出坐标
     console.log(`X: ${mouseX}, Y: ${mouseY}`);
-
+    
     // 如果你想在页面中显示，可以在HTML中指定一个元素进行展示
     const mousePositionElement = document.getElementById('mousePosition');
     if (mousePositionElement) {
