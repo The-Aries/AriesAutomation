@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Wicresoft
 // @namespace http://tampermonkey.net/
-// @version 0.974
+// @version 0.975
 // @updateURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @downloadURL https://raw.githubusercontent.com/The-Aries/AriesAutomation/main/Wicresoft.user.js
 // @description 该脚本用于自动播放打开的视频课程直到结束
@@ -19,7 +19,10 @@
     var iframeDoc;
     var video;
     var intervalId;
+    var playButton;
     var dummyButton;
+
+    window.dispatchEvent( new MouseEvent( 'click', { clientX: 130, clientY: 700, bubbles: true } ) );
 
     console.log( "所有资源加载完成，开始执行主逻辑" );
     // main();
@@ -181,47 +184,55 @@
             } else { console.log( "未找到确认按钮" ); }
         }, 500 ); // 延时0.5秒
     }
-    function clickNextStepButtonIfVisible()
+
+    function nextStep()
     {
-        const nextStepButton = document.getElementById( "goNextStep" );
-        if ( nextStepButton && !nextStepButton.classList.contains( "hide" ) )
+        // 初次检查按钮状态
+        nextOperation();
+        function nextOperation()
         {
-            console.log( "按钮已显示，点击进入下一步" );
-            nextStepButton.click();
-            return true;
+            const nextStepButton = document.getElementById( "goNextStep" );
+            if ( nextStepButton )
+            {
+                //console.log("找到'进入下一步'按钮");
+                if ( !nextStepButton.classList.contains( "hide" ) )
+                {
+                    console.log( "按钮已显示，点击进入下一步" );
+                    nextStepButton.click();
+                    nextButtonObserver.disconnect(); // 成功点击后停止观察
+                } //else { console.log("按钮未显示"); }
+            } //else { console.log("未找到'进入下一步'按钮"); }
+            return false; // 表示未处理
         }
-        console.log( "按钮未显示或未找到'进入下一步'按钮" );
-        return false;
-    }
-
-    function observeNextStepButton()
-    {
-        clickNextStepButtonIfVisible();
-
+        // 创建 MutationObserver 观察 DOM 变化
+        const nextButtonObserver = new MutationObserver( ( mutations ) =>
+        {
+            mutations.forEach( ( mutation ) =>
+            {
+                if ( mutation.type === "childList" || mutation.type === "attributes" )
+                { nextOperation(); }
+            } );
+        } );
+        // 限制观察范围为按钮的父元素
         const targetNode = document.getElementById( "goNextStep" )?.parentNode || document.body;
+
+        // 配置观察器
         const config = {
             childList: true,
             attributes: true,
             subtree: true,
         };
-        const observer = new MutationObserver( ( mutations ) =>
-        {
-            mutations.forEach( ( mutation ) =>
-            {
-                if ( mutation.type === "childList" || mutation.type === "attributes" )
-                {
-                    clickNextStepButtonIfVisible();
-                }
-            } );
-        } );
-        observer.observe( targetNode, config );
+        // 观察目标节点的变化
+        nextButtonObserver.observe( targetNode, config );
     }
+
     // 自动播放业务
     function autoPlayCourse()
     {
         // 进入下一步
-        observeNextStepButton();
+        nextStep();
         InitOp();
+        decisionMaking();
         autoPassCheat();// 自动过作弊
         autoClickNextChapter();// 自动播放下一章节
     }
@@ -234,9 +245,11 @@
         iframe ? ( iframeDoc = iframe.contentDocument ) : ( window.location.reload() );
 
         ( video = iframeDoc.querySelector( "video" ) ) ? ( video.muted = true ) : ( window.location.reload() );
-
         // console.log( iframeDoc.body );
+    }
 
+    function decisionMaking()
+    {
         switch ( iframe.id )
         {
             case "urlCourseIframeId":
@@ -256,7 +269,7 @@
                         console.log( "视频已播放，退出操作。" );
                         return;
                     }
-                    console.log( "检测到" + "video.src" + video.src + "  video.currentTime" + video.currentTime + "  video.paused == " + video.paused );
+                    console.log( "检测到" + video + " video.paused == " + video.paused );
                     iframe.contentDocument.querySelector( '.prism-play-btn' ).click();
                 }, 1000 ); // 每1秒执行一次
                 break;
@@ -264,7 +277,6 @@
             default:
                 window.location.reload();
         }
-
     }
     // 设置视频播放速度为2倍速
     function videoOperator()
@@ -361,7 +373,7 @@
         const currentChapterIndex = sections.indexOf( currentChapter );
 
         // 从当前章节开始，找到第一个未播放的章节
-        for ( let i = 0; i < sections.length; i++ )
+        for ( let i = 0; i < sections.length; i++ ) 
         {
             const index = ( currentChapterIndex + i ) % sections.length;
             const section = sections[index];
@@ -477,7 +489,7 @@ document.addEventListener('mousemove', function(event) {
 
     // 在控制台中输出坐标
     console.log(`X: ${mouseX}, Y: ${mouseY}`);
-
+    
     // 如果你想在页面中显示，可以在HTML中指定一个元素进行展示
     const mousePositionElement = document.getElementById('mousePosition');
     if (mousePositionElement) {
