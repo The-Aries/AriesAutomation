@@ -235,6 +235,7 @@
         decisionMaking();
         autoPassCheat();// 自动过作弊
         autoClickNextChapter();// 自动播放下一章节
+        (video.volume == 0.009 )?( video.volume = 0.009 ) : ( window.location.reload() );
     }
 
     function InitOp()
@@ -244,7 +245,9 @@
         // 检测aliPlayerFrame
         iframe ? ( iframeDoc = iframe.contentDocument ) : ( window.location.reload() );
 
-        ( video = iframeDoc.querySelector( "video" ) ) ? ( video.muted = true ) : ( window.location.reload() );
+        ( video = iframeDoc.querySelector( "video" ) ) ? ( video.volume = 0.009 ) : ( window.location.reload() );
+        //video.volume = 0.001;
+        //video.muted = false;
         // console.log( iframeDoc.body );
     }
 
@@ -346,6 +349,7 @@
                         {
                             autoPlayNextChapter();
                             console.warn( '章节发生变化' );
+                            window.location.reload();
                             setTimeout( InitOp, 2000 );
                             return;
                         }
